@@ -1,0 +1,118 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <div class="content">
+        </div>
+        <button id="startButton">Start</button>
+        <button id="endButton">End</button>
+        <button id="cal">Calculate</button>
+        <button id="obs">Obstacles</button>
+    </body>
+    <script>
+        //Store the grid representation
+        let start = false,
+            end = false,
+            startCell = null,
+            endCell = null,
+            obst = true,
+            start_count = 0,
+            end_count = 0,
+            obstacle = [];
+        
+        //Draw the grid
+        let createGrid = function(row, col) {
+            let content = document.getElementsByClassName("content")[0];
+            for (let i = 0; i < row; i++) {
+                let wrap = createDiv("row_"+i);
+                for (let j = 0; j < col; j++) {
+                    let cell = createDiv("cell_"+i+"_"+j+" cell");
+                    cell.addEventListener("click", clickHandler);
+                    wrap.appendChild(cell);
+                }
+                content.appendChild(wrap);
+            }
+
+            //Add even handlers to the buttons
+            document.getElementById("startButton").addEventListener("click", selectStart);
+            document.getElementById("endButton").addEventListener("click", selectEnd);
+            document.getElementById("cal").addEventListener("click", cal);
+            document.getElementById("cal").addEventListener("click", obs_on);
+        }
+
+        //Creates a generic div
+        let createDiv = function(className) {
+            let node = document.createElement("div");
+            node.setAttribute("class", className);
+            return node;
+        }
+
+        //Marks a cell with a color
+        let markCell = function(x, y, color) {
+            document.getElementsByClassName("cell_"+x+"_"+y)[0].style.backgroundColor = color;
+        }
+
+        //Event handler for the cell
+        let clickHandler = function(e) {
+            //If start is true then mark the starting cell
+            if (start) {
+                if(start_count < 1){
+                    start_count += 1;
+                    startCell = e.target.classList[0];
+                    e.target.style.backgroundColor = "green";
+                }
+                return;
+            }
+
+            //If end is true then mark the ending cell
+            if (end) {
+                if(end_count < 1){
+                    end_count += 1;
+                    endCell = e.target.classList[0];
+                    e.target.style.backgroundColor = "red";
+                }
+                return;
+            }
+
+            //If start and end are not true then mark the cell as an obstacle
+            e.target.style.backgroundColor = "black";
+            obstacle.push(e.target.classList[0]);
+        }
+
+        // Once this is true subsequent cell clicks will mark it as a start cell
+        let selectStart = function() {
+            end = false;
+            start = true;
+        }
+
+        // Once this is true subsequent clicks will mark it as a end cell
+        let selectEnd = function() {
+            start = false;
+            end = true;
+        }
+
+        // Main routing logic goes here
+        // You have access to the following letiables
+        let cal = function() {
+            console.log("Obstacle", obstacle);
+            console.log("Start", startCell);
+            console.log("End", endCell);
+        }
+
+        let obs_on = function(){
+            start = false;
+            end = false;
+
+        }
+        // Setup the grid on load
+        createGrid(10,10);
+    </script>
+    <style>
+        .cell {
+            border: 1px solid black;
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+        }
+    </style>
+</html>
