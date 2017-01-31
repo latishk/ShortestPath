@@ -1,6 +1,8 @@
 <html>
+
 <head>
 </head>
+
 <body>
     <div class="content">
     </div>
@@ -63,15 +65,15 @@
         // Get the co-ordinates for cell from className of the div
         let cellName = e.target.classList[0];
         cellName = cellName.split("_");
-        let tempX = cellName[1],
-            tempY = cellName[2];
-        // console.log(tempX, tempY);
+        let temp_x = cellName[1],
+            temp_y = cellName[2];
+        // console.log(temp_x, temp_y);
         //If start is true then mark the starting cell
         if (start) {
             if (start_count < 1) {
                 start_count += 1;
                 startCell = e.target.classList[0];
-                grid[tempX][tempY] = 'S';
+                grid[temp_x][temp_y] = 'S';
                 e.target.style.backgroundColor = "green";
                 return;
             }
@@ -82,7 +84,7 @@
             if (end_count < 1) {
                 end_count += 1;
                 endCell = e.target.classList[0];
-                grid[tempX][tempY] = 'E';
+                grid[temp_x][temp_y] = 'E';
                 e.target.style.backgroundColor = "red";
             }
             return;
@@ -91,7 +93,7 @@
         //If start and end are not true then mark the cell as an obstacle
         e.target.style.backgroundColor = "black";
         obstacle.push(e.target.classList[0]);
-        grid[tempX][tempY] = 'X';
+        grid[temp_x][temp_y] = 'X';
 
     }
 
@@ -136,29 +138,28 @@
         e = e.map(function (e) {
             return parseInt(e)
         })
-        //console.log(s, e, "\n");
+        console.log(s, e, "\n");
+
 
         let path = shortestPath(s, e, grid);
-        if (path != null) {
-            for (let row = 0; row < path.length; row++) {
-                for (let col = 0; col < path[0].length; col++) {
-                    if (path[row][col] == "P") {
-                        markCell(row, col, "blue");
-                    }
+        for (let l = 0; l < path.length; l++) {
+            console.log(path[l]);
+        }
+
+        for (let row = 0; row < path.length; row++) {
+            for (let col = 0; col < path[0].length; col++) {
+                if (path[row][col] == "P") {
+                    markCell(row, col, "blue");
                 }
             }
-        } else {
-            alert("NO PATH");
         }
     }
 
-    // Get the shortest path using BFS.
     let shortestPath = function (s, e, grid) {
         let visited = [],
             parent = [],
             queue = [];
         queue.push(s);
-
         // initiazize the visited and parent matrix
         for (let i = 0; i < grid.length; i++) {
             let row = [],
@@ -167,79 +168,81 @@
                 row.push(0);
                 p.push([-1, -1]);
             }
+
             visited.push(row);
             parent.push(p);
         }
 
         while (queue.length) {
             let current = queue.shift();
-
-            // if current is end node then return the path
+            // if current is end node then set parent of end to current
             if ((current[0] == e[0]) && (current[1] == e[1])) {
                 console.log("HHHHHHHHOOOOOORAAAAYYY!!!");
+                //parent[e[0]][e[1]] = current;
                 return getPath(e, s, parent, grid);
             }
 
             let neighbors = getNeighbors(current, grid);
 
-            for (let i = 0; i < neighbors.length; i++) {
+
+            for (let i = 0; i < neighbors.length; i += 1) {
                 let n = neighbors[i];
+
                 if ((grid[n[0]][n[1]] != 'X') && !(visited[n[0]][n[1]])) {
+                    console.log(" n for ", current, " is ", n);
                     parent[n[0]][n[1]] = current;
                     visited[n[0]][n[1]] = 1;
-
-                    // Marking the grid for visited nodes, later might help to visualize the process.
                     if (!grid[n[0]][n[1]])
                         grid[n[0]][n[1]] = "V";
-
                     queue.push(n);
-                    // console.log("parent of", n, "is", parent[n[0]][n[1]]);
+
+                    console.log("parent of", n, "is", parent[n[0]][n[1]]);
                 }
 
             }
-            // console.log("queue is: ", queue);
+            console.log("queue is: ", queue);
         }
         return null;
     }
 
-    // generate path by backtracking the parent.
     let getPath = function (e, s, parent, grd) {
+        // for(let l = 0; l<parent.length;l++){
+        //     console.log("p:", parent[l]);
+        // }
         let p = parent[e[0]][e[1]],
             g = grd;
+        console.log("yoyoyoyyo ", e, "is", p, "s is", s);
         while ((p[0] != s[0]) || (p[1] != s[1])) {
             g[p[0]][p[1]] = "P";
             p = parent[p[0]][p[1]];
+            console.log("parent ****of", p, "is", parent[p[0]][p[1]]);
         }
         return g;
     }
-
-    //Might use this in future to implement heuristics
     let getManhattanDistance = function (x1, y1, x2, y2) {
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
-    // get the neighbors of the a ignoring the diagonals
     let getNeighbors = function (a, grid) {
 
         let x = a[0],
-            y = a[1],
-            neighbors = [];
-        // if a is not top most row then add the cell above to the neighbors 
+            y = a[1];
+        let neighbors = [];
         if (x > 0) {
             neighbors.push([x - 1, y]);
         }
 
-        //not the bottom row then add cell below to the neighbors
+        //not the bottom row then add below cell
         if (x < grid.length - 1) {
             neighbors.push([x + 1, y]);
         }
 
-        // not the left most colum then add cell on the left  to the neighbors
+        // not the left most colum then add left cell
         if (y > 0) {
             neighbors.push([x, y - 1]);
         }
 
-        // not right most column then add cell on the right to the neighbors
+        // not right most column then add right cell
         if (a[1] < grid[0].length - 1) {
             neighbors.push([x, y + 1]);
         }
