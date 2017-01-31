@@ -1,118 +1,264 @@
 <html>
-    <head>
-    </head>
-    <body>
-        <div class="content">
-        </div>
-        <button id="startButton">Start</button>
-        <button id="endButton">End</button>
-        <button id="cal">Calculate</button>
-        <button id="obs">Obstacles</button>
-    </body>
-    <script>
-        //Store the grid representation
-        let start = false,
-            end = false,
-            startCell = null,
-            endCell = null,
-            obst = true,
-            start_count = 0,
-            end_count = 0,
-            obstacle = [];
-        
-        //Draw the grid
-        let createGrid = function(row, col) {
-            let content = document.getElementsByClassName("content")[0];
-            for (let i = 0; i < row; i++) {
-                let wrap = createDiv("row_"+i);
-                for (let j = 0; j < col; j++) {
-                    let cell = createDiv("cell_"+i+"_"+j+" cell");
-                    cell.addEventListener("click", clickHandler);
-                    wrap.appendChild(cell);
-                }
-                content.appendChild(wrap);
+
+<head>
+</head>
+
+<body>
+    <div class="content">
+    </div>
+    <button id="startButton">Start</button>
+    <button id="endButton">End</button>
+    <button id="cal">Calculate</button>
+    <button id="obs">Obstacles</button>
+</body>
+<script>
+    //Store the grid representation
+    let start = false,
+        end = false,
+        startCell = null,
+        endCell = null,
+        obst = true,
+        start_count = 0,
+        end_count = 0,
+        obstacle = [],
+        grid = [];
+
+
+    //Draw the grid and initialize grid matrix
+    let createGrid = function (row, col) {
+        let content = document.getElementsByClassName("content")[0];
+        for (let i = 0; i < row; i++) {
+            let wrap = createDiv("row_" + i);
+            let row = [];
+            for (let j = 0; j < col; j++) {
+                let cell = createDiv("cell_" + i + "_" + j + " cell");
+                cell.addEventListener("click", clickHandler);
+                wrap.appendChild(cell);
+                row.push(0);
             }
-
-            //Add even handlers to the buttons
-            document.getElementById("startButton").addEventListener("click", selectStart);
-            document.getElementById("endButton").addEventListener("click", selectEnd);
-            document.getElementById("cal").addEventListener("click", cal);
-            document.getElementById("cal").addEventListener("click", obs_on);
+            content.appendChild(wrap);
+            grid.push(row);
         }
 
-        //Creates a generic div
-        let createDiv = function(className) {
-            let node = document.createElement("div");
-            node.setAttribute("class", className);
-            return node;
-        }
+        //Add even handlers to the buttons
+        document.getElementById("startButton").addEventListener("click", selectStart);
+        document.getElementById("endButton").addEventListener("click", selectEnd);
+        document.getElementById("cal").addEventListener("click", cal);
+        document.getElementById("obs").addEventListener("click", obsOn);
+    }
 
-        //Marks a cell with a color
-        let markCell = function(x, y, color) {
-            document.getElementsByClassName("cell_"+x+"_"+y)[0].style.backgroundColor = color;
-        }
+    //Creates a generic div
+    let createDiv = function (className) {
+        let node = document.createElement("div");
+        node.setAttribute("class", className);
+        return node;
+    }
 
-        //Event handler for the cell
-        let clickHandler = function(e) {
-            //If start is true then mark the starting cell
-            if (start) {
-                if(start_count < 1){
-                    start_count += 1;
-                    startCell = e.target.classList[0];
-                    e.target.style.backgroundColor = "green";
-                }
+    //Marks a cell with a color
+    let markCell = function (x, y, color) {
+        document.getElementsByClassName("cell_" + x + "_" + y)[0].style.backgroundColor = color;
+    }
+
+    //Event handler for the cell
+    let clickHandler = function (e) {
+
+        // Get the co-ordinates for cell from className of the div
+        let cellName = e.target.classList[0];
+        cellName = cellName.split("_");
+        let temp_x = cellName[1],
+            temp_y = cellName[2];
+        // console.log(temp_x, temp_y);
+        //If start is true then mark the starting cell
+        if (start) {
+            if (start_count < 1) {
+                start_count += 1;
+                startCell = e.target.classList[0];
+                grid[temp_x][temp_y] = 'S';
+                e.target.style.backgroundColor = "green";
                 return;
             }
+        }
 
-            //If end is true then mark the ending cell
-            if (end) {
-                if(end_count < 1){
-                    end_count += 1;
-                    endCell = e.target.classList[0];
-                    e.target.style.backgroundColor = "red";
-                }
-                return;
+        //If end is true then mark the ending cell
+        if (end) {
+            if (end_count < 1) {
+                end_count += 1;
+                endCell = e.target.classList[0];
+                grid[temp_x][temp_y] = 'E';
+                e.target.style.backgroundColor = "red";
             }
-
-            //If start and end are not true then mark the cell as an obstacle
-            e.target.style.backgroundColor = "black";
-            obstacle.push(e.target.classList[0]);
+            return;
         }
 
-        // Once this is true subsequent cell clicks will mark it as a start cell
-        let selectStart = function() {
-            end = false;
-            start = true;
-        }
+        //If start and end are not true then mark the cell as an obstacle
+        e.target.style.backgroundColor = "black";
+        obstacle.push(e.target.classList[0]);
+        grid[temp_x][temp_y] = 'X';
 
-        // Once this is true subsequent clicks will mark it as a end cell
-        let selectEnd = function() {
-            start = false;
-            end = true;
-        }
+    }
 
-        // Main routing logic goes here
-        // You have access to the following letiables
-        let cal = function() {
+    // Once this is true subsequent cell clicks will mark it as a start cell
+    let selectStart = function () {
+        end = false;
+        start = true;
+    }
+
+    // Once this is true subsequent clicks will mark it as a end cell
+    let selectEnd = function () {
+        start = false;
+        end = true;
+    }
+
+    let obsOn = function () {
+        start = false;
+        end = false;
+    }
+
+    // Main routing logic goes here
+    // You have access to the following letiables
+    let cal = function () {
+        if (startCell == null) {
+            console.log("Please select the start")
+        } else if (endCell == null) {
+            console.log("Please select the end")
+        } else {
             console.log("Obstacle", obstacle);
             console.log("Start", startCell);
             console.log("End", endCell);
+            console.log("grid", grid);
         }
 
-        let obs_on = function(){
-            start = false;
-            end = false;
+        s = startCell.split('_');
+        s.shift();
+        s = s.map(function (e) {
+            return parseInt(e)
+        })
+        e = endCell.split('_');
+        e.shift();
+        e = e.map(function (e) {
+            return parseInt(e)
+        })
+        console.log(s, e, "\n");
 
+
+        let path = shortestPath(s, e, grid);
+        for (let l = 0; l < path.length; l++) {
+            console.log(path[l]);
         }
-        // Setup the grid on load
-        createGrid(10,10);
-    </script>
-    <style>
-        .cell {
-            border: 1px solid black;
-            width: 30px;
-            height: 30px;
-            display: inline-block;
+
+        for (let row = 0; row < path.length; row++) {
+            for (let col = 0; col < path[0].length; col++) {
+                if (path[row][col] == "P") {
+                    markCell(row, col, "blue");
+                }
+            }
         }
-    </style>
+    }
+
+    let shortestPath = function (s, e, grid) {
+        let visited = [],
+            parent = [],
+            queue = [];
+        queue.push(s);
+        // initiazize the visited and parent matrix
+        for (let i = 0; i < grid.length; i++) {
+            let row = [],
+                p = [];
+            for (let y = 0; y < grid[0].length; y++) {
+                row.push(0);
+                p.push([-1, -1]);
+            }
+
+            visited.push(row);
+            parent.push(p);
+        }
+
+        while (queue.length) {
+            let current = queue.shift();
+            // if current is end node then set parent of end to current
+            if ((current[0] == e[0]) && (current[1] == e[1])) {
+                console.log("HHHHHHHHOOOOOORAAAAYYY!!!");
+                //parent[e[0]][e[1]] = current;
+                return buildPath(e, s, parent, grid);
+            }
+
+            let neighbors = getNeighbors(current, grid);
+
+
+            for (let i = 0; i < neighbors.length; i += 1) {
+                let n = neighbors[i];
+
+                if ((grid[n[0]][n[1]] != 'X') && !(visited[n[0]][n[1]])) {
+                    console.log(" n for ", current, " is ", n);
+                    parent[n[0]][n[1]] = current;
+                    visited[n[0]][n[1]] = 1;
+                    if (!grid[n[0]][n[1]])
+                        grid[n[0]][n[1]] = "V";
+                    queue.push(n);
+
+                    console.log("parent of", n, "is", parent[n[0]][n[1]]);
+                }
+
+            }
+            console.log("queue is: ", queue);
+        }
+        return null;
+    }
+
+    let buildPath = function (e, s, parent, grd) {
+        // for(let l = 0; l<parent.length;l++){
+        //     console.log("p:", parent[l]);
+        // }
+        let p = parent[e[0]][e[1]],
+            g = grd;
+        console.log("yoyoyoyyo ", e, "is", p, "s is", s);
+        while ((p[0] != s[0]) || (p[1] != s[1])) {
+            g[p[0]][p[1]] = "P";
+            p = parent[p[0]][p[1]];
+            console.log("parent ****of", p, "is", parent[p[0]][p[1]]);
+        }
+        return g;
+    }
+    let getManhattanDistance = function (x1, y1, x2, y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+    let getNeighbors = function (a, grid) {
+
+        let x = a[0],
+            y = a[1];
+        let neighbors = [];
+        if (x > 0) {
+            neighbors.push([x - 1, y]);
+        }
+
+        //not the bottom row then add below cell
+        if (x < grid.length - 1) {
+            neighbors.push([x + 1, y]);
+        }
+
+        // not the left most colum then add left cell
+        if (y > 0) {
+            neighbors.push([x, y - 1]);
+        }
+
+        // not right most column then add right cell
+        if (a[1] < grid[0].length - 1) {
+            neighbors.push([x, y + 1]);
+        }
+        return neighbors;
+    }
+
+    // Setup the grid on load
+    createGrid(10, 10);
+</script>
+<style>
+    .cell {
+        border: 1px solid black;
+        width: 30px;
+        height: 30px;
+        display: inline-block;
+    }
+</style>
+
 </html>
