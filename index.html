@@ -1,13 +1,18 @@
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="content">
+    <div class="content" >
     </div>
-    <button id="startButton">Start</button>
-    <button id="endButton">End</button>
-    <button id="cal">Calculate</button>
-    <button id="obs">Obstacles</button>
+    <button id="startButton" class="btn btn-success">Start</button>
+    <button id="endButton" class="btn btn-danger">End</button>
+    <button id="cal" class="btn btn-primary">Calculate</button>
+    <button id="obs" class="btn btn-warning">Obstacles</button>
 </body>
 <script>
     //Store the grid representation
@@ -26,7 +31,7 @@
     let createGrid = function (row, col) {
         let content = document.getElementsByClassName("content")[0];
         for (let i = 0; i < row; i++) {
-            let wrap = createDiv("row_" + i);
+            let wrap = createDiv("row_" + i+ " row");
             let row = [];
             for (let j = 0; j < col; j++) {
                 let cell = createDiv("cell_" + i + "_" + j + " cell");
@@ -255,6 +260,12 @@
         width: 30px;
         height: 30px;
         display: inline-block;
+    }
+    .content{
+        margin: 50;
+    }
+    .btn-success{
+        margin-left: 40;
     }
 </style>
 
